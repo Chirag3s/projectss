@@ -1,0 +1,57 @@
+import os
+
+def check_win(player1, player2):
+    if player1 == player2:
+        return "Draw"
+    elif (player1 == "Rock" and player2 == "Scissors") or (player1 == "Scissors" and player2 == "Paper") or (player1 == "Paper" and player2 == "Rock"):
+        return "Player 1 wins"
+    else:
+        return "Player 2 wins"
+
+def update_score(player, score):
+    if not os.path.exists("scores.txt"):
+        with open("scores.txt", "w") as f:
+            f.write("{}: {}".format(player, score))
+    else:
+        with open("scores.txt", "r") as f:
+            lines = f.readlines()
+        scores = {}
+        for line in lines:
+            name, s = line.strip().split(": ")
+            scores[name] = int(s)
+        if player not in scores or score > scores[player]:
+            scores[player] = score
+        with open("scores.txt", "w") as f:
+            for name, s in scores.items():
+                f.write("{}: {}\n".format(name, s))
+
+def get_highest_score():
+    if not os.path.exists("scores.txt"):
+        return None
+    with open("scores.txt", "r") as f:
+        lines = f.readlines()
+    scores = {}
+    for line in lines:
+        name, s = line.strip().split(": ")
+        scores[name] = int(s)
+    return max(scores, key=scores.get)
+
+def play_game(player1, player2):
+    result = check_win(player1, player2)
+    print(result)
+    if result == "Player 1 wins":
+        update_score("Player 1", 1)
+    elif result == "Player 2 wins":
+        update_score("Player 2", 1)
+
+print("Rock Paper Scissors Game")
+while True:
+    player1 = input("Player 1, make your move (Rock/Paper/Scissors): ")
+    player2 = input("Player 2, make your move (Rock/Paper/Scissors): ")
+    play_game(player1, player2)
+    highest_score = get_highest_score()
+    if highest_score:
+        print("The current highest score is held by {}".format(highest_score))
+    play_again = input("Do you want to play again? (Y/N): ")
+    if play_again.upper() == "N":
+        break
